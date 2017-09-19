@@ -18,6 +18,7 @@ def index():
 @socketio.on('message')
 def handle_message(json):
     print('received json: ' + str(json))
+    socketio.emit('message', json)
 
 if __name__ == '__main__':
     socketio.run(app)
