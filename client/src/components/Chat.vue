@@ -33,7 +33,7 @@ import VueSocketio from 'vue-socket.io'
 
 Vue.use(
   VueSocketio,
-  `${location.protocol}//${location.hostname}:5000`)// ${location.port}`)
+  `${location.protocol}//${location.hostname}:${location.port}`)
 export default {
   name: 'chat',
   data () {
