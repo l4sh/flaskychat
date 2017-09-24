@@ -22,4 +22,4 @@ def init_app(config=Config):
         app.register_blueprint(main_blueprint)
 
     socketio.init_app(app)
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
