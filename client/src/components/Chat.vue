@@ -24,34 +24,123 @@
 import Vue from 'vue'
 import VueSocketio from 'vue-socket.io'
 
-Vue.use(VueSocketio, 'http://localhost:5000')
-
-export default{
+Vue.use(
+  VueSocketio,
+  `${location.protocol}//${location.hostname}:5000`)// ${location.port}`)
+export default {
   name: 'chat',
-  // el: '#container',
   data () {
     return {
       message: null,
-      messages: []
+      messages: [],
+      room: null,
+      nick: null
     }
   },
   methods: {
+
+    /**
+     * Send message socket event
+     */
     send (message) {
       if (message) {
-        this.$socket.emit('message', { text: message })
+        if (!this.parseCommand(message)) {
+          this.$socket.emit('message', { text: message })
+        }
         this.message = ''
       }
     },
+
+    /**
+     * Handle messagebox input
+     */
     inputHandler (e) {
       if (e.keyCode === 13 && !e.shiftKey) {
         e.preventDefault()
         this.send(e.target.value)
       }
+    },
+
+    /**
+     * Check if message is a valid client command and run it
+     * or pass it to the server.
+     */
+    parseCommand (message) {
+      if (!message.startsWith('/')) {
+        // It's a regular message
+        return false
+      }
+
+      message = message.substring(1).split(' ')
+      let command = message[0]  // Commands start with _
+      let options = message.slice(1)
+
+      if (command in this.clientCommands()) {
+        this.clientCommands(command)(options)
+        return true
+      }
+    },
+
+    /**
+     * Handle client side commands
+     */
+    clientCommands (command) {
+      let vm = this
+      let commandList = {
+
+        /**
+         * Set user nickname
+         */
+        nick (options) {
+          if (options.length < 1 && !/^[a-z0-9_]+$/.test(options[0])) {
+            vm.pushErrorMessage(
+              'You must enter a valid nick.',
+              'INVALID_NICK')
+            return
+          }
+          let nick = options[0]
+          vm.$socket.emit('nick', {nick: nick})
+        },
+
+        /**
+         * Join a room
+         */
+        join (options) {
+          if (options.length < 1 && !/^#[a-z0-9#_-]+$/.test(options[0])) {
+            vm.pushErrorMessage(
+              'You must enter a valid room name.',
+              'INVALID_ROOM_NAME')
+            return
+          }
+          let room = options[0]
+          vm.$socket.emit('join', {room: room})
+        }
+      }
+
+      return command ? commandList[command] : commandList
+    },
+
+    /**
+     * Add an error message to the list of messages
+     */
+    pushErrorMessage (text, error) {
+      this.messages.push({
+        error: error,
+        text: text
+      })
     }
   },
+
+  /**
+   * Handle SocketIO events
+   */
   sockets: {
+
+    /**
+     * Handle client connection
+     */
     connect () {
-      console.log('Connected to FlaskyChat server')
+      console.log('Connected to server')
 
       // Remove connection error message if found
       let lastMessage = this.messages[this.messages.length - 1]
@@ -61,7 +150,15 @@ export default{
            lastMessage.error === 'CONNECT_ERROR')) {
         this.messages.pop()
       }
+
+      // TODO: allow multiple rooms
+      // Join general channel on connect
+      // this.clientCommands('join')(['#general'])
     },
+
+    /**
+     * On connection error
+     */
     connect_error () {
       // Set connection error message
       let lastMessage = this.messages[this.messages.length - 1]
