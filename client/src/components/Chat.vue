@@ -194,6 +194,15 @@ export default {
       if (el.scrollTop >= (maxScroll - 10)) {
         setTimeout(() => el.scrollTo(0, el.scrollHeight), 100)
       }
+    },
+
+    /**
+     * Handle nick events
+     */
+    nick (data) {
+      if (('status' in data && status === 'OK') && 'nick' in data) {
+        this.nick = data.nick
+      }
     }
   }
 }
