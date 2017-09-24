@@ -210,51 +210,71 @@ export default {
 
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.chat {
-  color: #333;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 1em;
+<style>
+#app {
+  margin-top: 20px;
 }
 
-.wrapper {
-  max-width: 600px;
+.chat {
+  color: #666;
+  font-family: monospace;
+  font-size: 1em;
+
+  max-width: 100%;
+  min-height: 100%;
+
   grid-template-columns: 20% auto;
   grid-template-areas:
     "messages"
     "messagebox";
   margin: 0 auto;
-  height: 50vh;
+  color: #666;
+  padding: 10px;
 }
 
+
 .messages {
+  padding: 10px;
+  background-color: #fff;
   grid-area: messages;
   text-align: left;
   height: 100%;
   border: solid 1px #b1b1b1;
+  border-radius: 5px;
+  overflow-y: scroll;
+  min-height: calc(100vh - 200px);
 }
 
 .messagebox {
   margin-top: 10px;
   grid-area: messagebox;
   border: solid 1px #b1b1b1;
+  border-radius: 5px;
 }
 
-textarea:focus, input:focus{
+.messagebox textarea:focus,
+.messagebox input:focus{
   outline: none;
 }
 
-.messagebox .chat.input {
-  padding: 0;
+.messagebox .input {
+  padding: 10px;
+  box-sizing: border-box;
   width: 100%;
   border: none;
   resize: none;
 }
 
 .wrapper {
-  background-color: #fff;
-  color: #444;
+  color: #34495e;
 }
 
+/* Message colors */
+.system.message {
+  color: #41B883;
+}
+
+.error.message {
+  color: #FB503B;
+}
 </style>
