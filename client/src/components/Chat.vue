@@ -1,12 +1,19 @@
 <template>
-  <div class="chat wrapper">
-    <div class="chat messages">
+  <div class="chat">
+    <div class="messages" id="messages">
       <div v-for="msg in messages">
-        <p>{{ msg.text }}</p>
-
+        <p v-if="msg.system">
+          <em class="system message">{{ msg.text }}</em>
+        </p>
+        <p v-else-if="msg.error">
+          <em class="error message">{{ msg.text }}</em>
+        </p>
+        <p v-else>
+          <strong>{{ msg.nick }}:</strong> {{ msg.text }}</p>
+        </p>
       </div>
     </div>
-    <div class="chat messagebox">
+    <div class="messagebox">
       <form @submit.prevent="send(message)">
           <textarea
             class="chat input"
