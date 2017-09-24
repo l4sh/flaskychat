@@ -181,8 +181,19 @@ export default {
         text: 'Connection error...'
       })
     },
+
+    /**
+     * Handle message events
+     */
     message (message) {
       this.messages.push(message)
+
+      // Autoscroll if at the latest message
+      let el = document.getElementById('messages')
+      let maxScroll = el.scrollHeight - el.clientHeight
+      if (el.scrollTop >= (maxScroll - 10)) {
+        setTimeout(() => el.scrollTo(0, el.scrollHeight), 100)
+      }
     }
   }
 }
